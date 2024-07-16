@@ -229,7 +229,7 @@ def game_loop():
         # Ограничение по высоте
         if player["y"] + player_size >= HEIGHT:
             player["y"] = HEIGHT - player_size
-            player["on_ground"] = True
+            player["on_ground"] = True #true
 
         # Проверка достижения конца уровня
         end_rect = pygame.Rect((dungeon_width - 2) * tile_size, (dungeon_height - 2) * tile_size, tile_size, tile_size)
