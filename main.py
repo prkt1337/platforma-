@@ -73,8 +73,7 @@ def check_collision(player_rect, dungeon):
                 if player_rect.colliderect(tile_rect):
                     return "wall", None
             elif dungeon[y][x] == "2":
-                spike_rect = pygame.Rect(x * tile_size + spike_size // 2, y * tile_size + spike_size // 2, spike_size,
-                                         spike_size)
+                spike_rect = pygame.Rect(x * tile_size + spike_size // 2, y * tile_size + spike_size // 2, spike_size, spike_size)
                 if player_rect.colliderect(spike_rect):
                     return "spike", spike_rect
     return None, None
@@ -87,8 +86,7 @@ def draw_dungeon(dungeon):
             if dungeon[y][x] == "1":
                 win.blit(wall_sprite, (x * tile_size, y * tile_size))
             elif dungeon[y][x] == "2":
-                pygame.draw.rect(win, SPIKE_COLOR, (
-                x * tile_size + spike_size // 2, y * tile_size + spike_size // 2, spike_size, spike_size))
+                pygame.draw.rect(win, SPIKE_COLOR, (x * tile_size + spike_size // 2, y * tile_size + spike_size // 2, spike_size, spike_size))
 
 def draw_health_bar(player):
     health_ratio = player["health"] / max_health
@@ -124,6 +122,12 @@ def main_menu():
 
         pygame.display.update()
 
+def pause_menu():
+    font = pygame.font.Font(None, 74)
+    pause_text = font.render("Пауза", True, WHITE)
+    win.blit(pause_text, (WIDTH // 2 - pause_text.get_width() // 2, HEIGHT // 2 - pause_text.get_height() // 2))
+    pygame.display.update()
+
 def main():
     global paused
     paused = False
@@ -153,38 +157,7 @@ def main():
         pygame.display.update()
 
     pygame.quit()
-
-def pause_menu():
-    global paused  # Добавлено глобальное объявление переменной paused
-    font = pygame.font.Font(None, 74)
-    paused = True
-    while paused:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    paused = False
-                    return  # Добавлено возвращение из функции
-                if event.key == pygame.K_m:
-                    main_menu()
-
-        win.fill(BLACK)
-        pause_text = font.render("Пауза", True, WHITE)
-        win.blit(pause_text, (WIDTH // 2 - pause_text.get_width() // 2, HEIGHT // 4))
-
-        font_small = pygame.font.Font(None, 56)
-        continue_text = font_small.render("Нажмите ESC для продолжения", True, WHITE)
-        win.blit(continue_text, (WIDTH // 2 - continue_text.get_width() // 2, HEIGHT // 2))
-
-        menu_text = font_small.render("Нажмите M для выхода в меню", True, WHITE)
-        win.blit(menu_text, (WIDTH // 2 - menu_text.get_width() // 2, HEIGHT // 2 + 50))
-
-        pygame.display.update()
-
-    return
-
+# Основной цикл игры
 def game_loop():
     player = init_player()
     start_time = time.time()
@@ -197,7 +170,7 @@ def game_loop():
     last_dash_time = 0
     dash_duration = 0.2
     dash_speed = 20
-    player_speed = 5
+    player_speed = 8
     normal_speed = player_speed
     dashing = False
     dash_direction = 0
@@ -320,6 +293,7 @@ def game_loop():
 
     pygame.quit()
 
+# Экран победы
 def victory_screen(start_time):
     total_time = time.time() - start_time
     win.fill(BLACK)
@@ -329,9 +303,19 @@ def victory_screen(start_time):
     total_time_text = font.render(f"Общее время: {int(total_time)} сек", True, GREEN)
     win.blit(total_time_text, (WIDTH // 2 - total_time_text.get_width() // 2, HEIGHT // 2 - total_time_text.get_height() // 2 + 20))
     pygame.display.update()
-    time.sleep(5)
-    main_menu()
 
+    # Ожидание нажатия любой клавиши для выхода с экрана победы
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            if event.type == pygame.KEYDOWN:
+                waiting = False
+
+    main_menu()
+# Экран поражения
 def game_over():
     win.fill(BLACK)
     font = pygame.font.Font(None, 74)
@@ -342,4 +326,3 @@ def game_over():
     main_menu()
 
 main_menu()
-
